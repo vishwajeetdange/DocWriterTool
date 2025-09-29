@@ -101,7 +101,7 @@ class GitHubDocGenerator:
         # Azure OpenAI setup for GPT-4-turbo
         self.deployment_name = deployment_name
         openai.api_type = "azure"
-        openai.api_version = "2024-05-01-preview"
+        openai.api_version = ""
         openai.api_key = api_key
         openai.api_base = api_base
 

@@ -72,29 +72,29 @@ OUTPUT_DIR = Path('generated_docs')
 OUTPUT_DIR.mkdir(exist_ok=True)
  
 # Load configuration from environment variables
-app.config['GITHUB_TOKEN'] = "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"
-DEPLOYMENT_NAME = "docwriter-gpt-4o"
-API_KEY = "DmeYPgsWhvBuyttBZMQZsUM7GAW0QAn6pWfxYara20dwZqxH0ylrJQQJ99BHACHYHv6XJ3w3AAAAACOG5bWx"
-API_BASE = "https://docwriter.cognitiveservices.azure.com/"
+app.config['GITHUB_TOKEN'] = ""
+DEPLOYMENT_NAME = ""
+API_KEY = ""
+API_BASE = ""
  
  
 # Azure Blob Storage Configuration
-app.config['AZURE_STORAGE_CONNECTION_STRING'] = "DefaultEndpointsProtocol=https;AccountName=docwritertool;AccountKey=ckTIdmfnZoRz7w9Xmwp6pxztPFSL/mH9VAVGA8QyuXwtuutxBOSLT1hOQqNEQWUJ1sjU3eRJDa70+AStBp9y6Q==;EndpointSuffix=core.windows.net"
-app.config['AZURE_STORAGE_CONTAINER'] = "docwriter-container"
-app.config['AZURE_STORAGE_ACCOUNT'] = "docwritertool"
-app.config['AZURE_STORAGE_KEY'] = "ckTIdmfnZoRz7w9Xmwp6pxztPFSL/mH9VAVGA8QyuXwtuutxBOSLT1hOQqNEQWUJ1sjU3eRJDa70+AStBp9y6Q=="
+app.config['AZURE_STORAGE_CONNECTION_STRING'] = ""
+app.config['AZURE_STORAGE_CONTAINER'] = ""
+app.config['AZURE_STORAGE_ACCOUNT'] = ""
+app.config['AZURE_STORAGE_KEY'] = ""
  
 # Azure SQL Configuration
-app.config['SQL_SERVER'] = 'ycatserver.database.windows.net'
-app.config['SQL_DATABASE'] = 'ycat'
-app.config['SQL_USERNAME'] = 'ycattool_admin'
-app.config['SQL_PASSWORD'] = 'Cat-db@123'  
-app.config['SQL_DRIVER'] = 'ODBC Driver 17 for SQL Server'
+app.config['SQL_SERVER'] = ''
+app.config['SQL_DATABASE'] = ''
+app.config['SQL_USERNAME'] = ''
+app.config['SQL_PASSWORD'] = ''  
+app.config['SQL_DRIVER'] = ''
 
 # Azure Cognitive Search Configuration
-app.config['AZURE_SEARCH_SERVICE_NAME'] = "docwritersearchai"
-app.config['AZURE_SEARCH_ADMIN_KEY'] = "P00ONTx9LLtiuQSGylkCUfLPwGqGnRoSXP5CGnaPZhAzSeB631Qq"
-app.config['AZURE_SEARCH_INDEX_NAME'] = "docs-index"
+app.config['AZURE_SEARCH_SERVICE_NAME'] = ""
+app.config['AZURE_SEARCH_ADMIN_KEY'] = ""
+app.config['AZURE_SEARCH_INDEX_NAME'] = ""
 
 # Initialize Flask-Login
 login_manager = LoginManager()
@@ -491,10 +491,10 @@ def chat_handler():
             })
 
         # Generate enhanced response with OpenAI using conversation history
-        openai.api_type = "azure"
-        openai.api_base = "https://docwriter.cognitiveservices.azure.com/"
-        openai.api_version = "2024-05-01-preview"
-        openai.api_key = "DmeYPgsWhvBuyttBZMQZsUM7GAW0QAn6pWfxYara20dwZqxH0ylrJQQJ99BHACHYHv6XJ3w3AAAAACOG5bWx"
+        openai.api_type = ""
+        openai.api_base = ""
+        openai.api_version = ""
+        openai.api_key = ""
 
         # Prepare messages with system prompt and conversation history
         messages = [{
@@ -545,7 +545,7 @@ def chat_handler():
         })
 
         response = openai.ChatCompletion.create(
-            engine="docwriter-gpt-4o",
+            engine="",
             messages=messages,
             temperature=0.3,
             max_tokens=1000
