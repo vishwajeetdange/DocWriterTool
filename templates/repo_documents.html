@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ doc_name }} - DocWriter Tool</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/YCAT_Logo.png') }}">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.1.0/github-markdown.min.css" rel="stylesheet">
+    <style>
+        /* Custom styles for markdown content */
+        .markdown-body {
+            box-sizing: border-box;
+            min-width: 200px;
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 45px;
+        }
+        
+        @media (max-width: 767px) {
+            .markdown-body {
+                padding: 15px;
+            }
+        }
+        
+        /* Code highlighting */
+        .markdown-body pre {
+            background-color: #f6f8fa;
+            border-radius: 6px;
+            padding: 16px;
+            overflow: auto;
+        }
+        
+        .markdown-body code {
+            font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
+            font-size: 85%;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <!-- Navigation Bar -->
+    <nav class="navbar bg-white shadow-sm">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex items-center justify-between">
+                <a href="/" class="flex items-center space-x-3">
+                    <img src="{{ url_for('static', filename='images/Yash_Logo.png') }}" alt="Logo" class="h-8">
+                    <span class="text-xl font-bold text-indigo-600">DocWriter Tool</span>
+                </a>
+                <div class="flex items-center space-x-4">
+                    <span class="text-gray-600">Welcome, {{ current_user.name }}</span>
+                    <a href="{{ url_for('logout') }}" class="text-gray-600 hover:text-gray-800 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md hover:bg-gray-100">
+                        <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8 max-w-5xl">
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <!-- Header Section -->
+            <div class="bg-white px-6 py-4 border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold text-gray-800">
+                        <i class="fas fa-file-alt text-indigo-600 mr-2"></i>
+                        {{ repo_name }} - {{ doc_name }}
+                    </h2>
+                    <a href="{{ url_for('view_repo_documents', repo_name=repo_name) }}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        <i class="fas fa-arrow-left mr-2"></i> Back to Documents
+                    </a>
+                </div>
+            </div>
+
+            <!-- Document Content -->
+            <div class="markdown-body">
+                {{ content|safe }}
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-12 border-t border-gray-200 bg-white">
+        <div class="container mx-auto px-4 py-6">
+            <div class="text-center text-sm text-gray-500">
+                <p>© 2025 DocWriter Tool. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

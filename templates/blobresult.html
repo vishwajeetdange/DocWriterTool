@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DocWriter Tool - Documentation Viewer</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/YCAT_Logo.png') }}">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/plantuml-encoder@1.4.0/dist/plantuml-encoder.min.js"></script>
+    <style>
+        /* Theme variables */
+        :root {
+            --primary-color: #4218EE;
+            --secondary-color: #3f37c9;
+            --accent-color: #f72585;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --border-radius: 15px;
+            --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            --font-heading: 'Inter', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --font-weight-light: 300;
+            --font-weight-regular: 400;
+            --font-weight-medium: 500;
+            --font-weight-semibold: 600;
+            --font-weight-bold: 700;
+        }
+
+        /* Performance optimizations */
+        html {
+            scroll-behavior: smooth;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Glassmorphism background effects - optimized */
+        body {
+            font-family: var(--font-body);
+            font-weight: var(--font-weight-regular);
+            line-height: 1.6;
+            color: rgba(0, 0, 0, 0.85);
+            background: linear-gradient(135deg, #D6E4F0 0%, #F5F2E8 100%) fixed;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Optimized floating elements */
+        body::before,
+        body::after {
+            content: '';
+            position: fixed;
+            border-radius: 50%;
+            background: rgba(66, 24, 238, 0.1);
+            z-index: -1;
+            will-change: transform;
+        }
+
+        body::before {
+            width: 300px;
+            height: 300px;
+            top: -100px;
+            right: -50px;
+            animation: float 15s infinite alternate ease-in-out;
+        }
+
+        body::after {
+            width: 450px;
+            height: 450px;
+            bottom: -150px;
+            left: -100px;
+            animation: float 20s infinite alternate-reverse ease-in-out;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            100% {
+                transform: translate(50px, 50px) rotate(15deg);
+            }
+        }
+
+        /* Main content wrapper - TRANSPARENT */
+        .main-content {
+            flex: 1;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+            background: transparent;
+            padding: 2rem 0;
+        }
+
+        /* Glassmorphism cards - optimized */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            will-change: transform;
+        }
+
+        /* Base animations and transitions - optimized */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        /* Animations and transitions */
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        .animate-pulse-gentle {
+            animation: pulse 2s infinite;
+        }
+
+        .stagger-animation>* {
+            opacity: 0;
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        /* Navbar and branding - optimized */
+        .navbar {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+            will-change: transform;
+        }
+
+        /* Footer - fixed height and position */
+        footer {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.4);
+            width: 100%;
+            flex-shrink: 0;
+            z-index: 10;
+        }
+
+        /* Performance optimizations for cards */
+        .file-card {
+            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease;
+            will-change: transform, box-shadow;
+        }
+
+        .file-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        .file-card.markdown-card {
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .file-card.pdf-card {
+            border-left: 4px solid #dc2626;
+        }
+
+        .file-card.diagram-card {
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .file-card.architecture-card {
+            border-left: 4px solid #d97706;
+        }
+
+        /* New flow diagram card styling */
+        .file-card.flow-diagram-card {
+            border-left: 4px solid #059669;
+        }
+
+        .btn {
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gradient-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        }
+
+        /* Header icon animation */
+        .header-icon {
+            position: relative;
+            overflow: hidden;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 60px;
+        }
+
+        .header-icon::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.4) 50%, rgba(255, 255, 255, 0) 100%);
+            transform: rotate(45deg);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%) rotate(45deg);
+            }
+
+            100% {
+                transform: translateX(100%) rotate(45deg);
+            }
+        }
+
+        /* Remove blur effects on mobile for better performance */
+        @media (max-width: 768px) {
+
+            .glass-card,
+            .navbar,
+            footer {
+                backdrop-filter: none;
+                -webkit-backdrop-filter: none;
+                background: rgba(255, 255, 255, 0.95);
+            }
+
+            body::before,
+            body::after {
+                display: none;
+            }
+        }
+
+        /* Make content header transparent */
+        .content-header {
+            background: transparent;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            border-radius: var(--border-radius);
+            box-shadow: none;
+            border: none;
+            margin-bottom: 2rem;
+        }
+
+        .documents-container {
+            background: transparent;
+            padding: 0;
+        }
+
+        /* Styling for user welcome */
+        .user-welcome {
+            font-family: var(--font-body);
+            font-weight: var(--font-weight-medium);
+            color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .user-welcome i {
+            color: var(--primary-color);
+            margin-right: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        /* New styles for navbar buttons */
+        .nav-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .btn-home {
+
+            color: var(--primary-color);
+            border: 1px solid rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-home:hover {
+            background-color: rgba(79, 70, 229, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .btn-logout {
+
+            color: #dc2626;
+            border: 1px solid rgba(220, 38, 38, 0.3);
+        }
+
+        .btn-logout:hover {
+            background-color: rgba(239, 24, 24, 0.2);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Enhanced Navigation Bar with glass effect -->
+    <nav class="navbar">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex items-center justify-between">
+                <a href="/" class="flex items-center space-x-3 logo-container">
+                    <img src="{{ url_for('static', filename='images/Yash_Logo.png') }}" alt="Logo" class="h-10">
+                    <span class="text-xl font-bold text-indigo-600">DocWriter Tool</span>
+                </a>
+                <div class="flex items-center space-x-4">
+                    <div class="user-welcome hidden md:flex">
+                        <i class="fas fa-user-circle"></i>
+                        <span>Welcome, {{ current_user.name }}</span>
+                    </div>
+
+                    <a href="/" class="nav-btn btn-home">
+                        <i class="fas fa-home mr-2"></i> Home
+                    </a>
+
+                    <a href="{{ url_for('logout') }}" class="nav-btn btn-logout">
+                        <i class="fas fa-sign-out-alt mr-2"></i> <span class="hidden sm:inline">Logout</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content with transparent background -->
+    <main class="main-content container mx-auto px-4 max-w-5xl">
+        <!-- Header Section with transparent background -->
+        <div class="content-header px-6 py-5">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                    <div class="gradient-primary p-3 rounded-full mr-4 shadow-lg header-icon flex-shrink-0">
+                        <i class="fas fa-folder-open text-white"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800">
+                            {{ repo_name }}
+                        </h2>
+                        <p class="text-gray-500 text-sm mt-1">Documentation Repository</p>
+                    </div>
+                </div>
+                <a href="{{ url_for('user_documents') }}"
+                    class="btn inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md">
+                    <i class="fas fa-arrow-left mr-2"></i> Back to repository
+                </a>
+            </div>
+        </div>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="glass-card space-y-4 p-6 mb-6">
+            {% for category, message in messages %}
+            <div class="p-4 rounded-lg shadow-sm animate-fade-in
+                        {% if category == 'error' %}
+                            border-l-4 border-red-500 bg-red-50
+                        {% else %}
+                            border-l-4 border-green-500 bg-green-50
+                        {% endif %}">
+                <div class="flex items-center">
+                    <i
+                        class="fas {% if category == 'error' %}fa-exclamation-circle text-red-500{% else %}fa-check-circle text-green-500{% endif %} mr-3 text-xl"></i>
+                    <p class="{% if category == 'error' %}text-red-700{% else %}text-green-700{% endif %}">
+                        {{ message }}
+                    </p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <!-- Documents Section with transparent background -->
+        <div class="documents-container">
+            {% if markdown_path or pdf_path or class_diagram_path or reference_architecture_path or flow_diagram_path %}
+            <div class="space-y-6 stagger-animation">
+
+                <!-- Markdown File -->
+                {% if markdown_path %}
+                <div class="file-card markdown-card glass-card p-6 hover:shadow-xl">
+                    <div class="flex items-center justify-between flex-wrap">
+                        <div class="flex items-center">
+                            <div class="bg-indigo-100 p-3 rounded-lg mr-4">
+                                <i class="fas fa-file-alt text-indigo-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-800">Markdown Documentation</h3>
+                                <p class="text-sm text-gray-500">Technical documentation in Markdown format</p>
+                            </div>
+                        </div>
+                        <div class="flex space-x-3 mt-4 sm:mt-0 file-card-actions">
+                            <a href="{{ url_for('view_document', doc_id=markdown_id) }}" target="_blank"
+                                class="btn inline-flex items-center px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100">
+                                <i class="fas fa-eye mr-2"></i> View
+                            </a>
+                            <a href="{{ url_for('download_document', doc_id=markdown_id) }}"
+                                class="btn inline-flex items-center px-4 py-2 bg-green-50 text-green-700 rounded-lg hover:bg-green-100">
+                                <i class="fas fa-download mr-2"></i> Download
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- PDF File -->
+                {% if pdf_path %}
+                <div class="file-card pdf-card glass-card p-6 hover:shadow-xl">
+                    <div class="flex items-center justify-between flex-wrap">
+                        <div class="flex items-center">
+                            <div class="bg-red-100 p-3 rounded-lg mr-4">
+                                <i class="fas fa-file-pdf text-red-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-800">PDF Documentation</h3>
+                                <p class="text-sm text-gray-500">Printable documentation in PDF format</p>
+                            </div>
+                        </div>
+                        <div class="flex space-x-3 mt-4 sm:mt-0 file-card-actions">
+                            <a href="{{ pdf_path }}" target="_blank"
+                                class="btn inline-flex items-center px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100">
+                                <i class="fas fa-eye mr-2"></i> View
+                            </a>
+                            <a href="{{ url_for('download_document', doc_id=pdf_id) }}"
+                                class="btn inline-flex items-center px-4 py-2 bg-green-50 text-green-700 rounded-lg hover:bg-green-100">
+                                <i class="fas fa-download mr-2"></i> Download
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Class Diagram -->
+                {% if class_diagram_path %}
+                <div class="file-card diagram-card glass-card p-6 hover:shadow-xl">
+                    <div class="flex items-center justify-between flex-wrap">
+                        <div class="flex items-center">
+                            <div class="bg-purple-100 p-3 rounded-lg mr-4">
+                                <i class="fas fa-project-diagram text-purple-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-800">Class, Flow or ER Diagram</h3>
+                                <p class="text-sm text-gray-500">Visual representation of system classes</p>
+                            </div>
+                        </div>
+                        <div class="flex space-x-3 mt-4 sm:mt-0 file-card-actions">
+                            <a href="{{ url_for('view_document', doc_id=class_diagram_id) }}" target="_blank"
+                                class="btn inline-flex items-center px-4 py-2 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100">
+                                <i class="fas fa-eye mr-2"></i> View
+                            </a>
+                            <a href="{{ url_for('diagram_editor') }}"
+                                class="btn inline-flex items-center px-4 py-2 bg-red-50 text-red-500 rounded-lg hover:bg-red-100 mr-2">
+                                <i class="fas fa-edit mr-2"></i> Editor
+                            </a>
+                            <a href="{{ url_for('download_document', doc_id=class_diagram_id) }}"
+                                class="btn inline-flex items-center px-4 py-2 bg-green-50 text-green-700 rounded-lg hover:bg-green-100">
+                                <i class="fas fa-download mr-2"></i> Download
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Flow Diagram - NEW SECTION -->
+                {% if flow_diagram_path %}
+                <div class="file-card flow-diagram-card glass-card p-6 hover:shadow-xl">
+                    <div class="flex items-center justify-between flex-wrap">
+                        <div class="flex items-center">
+                            <div class="bg-green-100 p-3 rounded-lg mr-4">
+                                <i class="fas fa-route text-green-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-800">Flow Diagram</h3>
+                                <p class="text-sm text-gray-500">Program flow and control structure visualization</p>
+                            </div>
+                        </div>
+                        <div class="flex space-x-3 mt-4 sm:mt-0 file-card-actions">
+                            <a href="{{ url_for('view_document', doc_id=flow_diagram_id) }}" target="_blank"
+                                class="btn inline-flex items-center px-4 py-2 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100">
+                                <i class="fas fa-eye mr-2"></i> View
+                            </a>
+                            <a href="{{ url_for('diagram_editor') }}"
+                                class="btn inline-flex items-center px-4 py-2 bg-red-50 text-red-500 rounded-lg hover:bg-red-100 mr-2">
+                                <i class="fas fa-edit mr-2"></i> Editor
+                            </a>
+                            <a href="{{ url_for('download_document', doc_id=flow_diagram_id) }}"
+                                class="btn inline-flex items-center px-4 py-2 bg-green-50 text-green-700 rounded-lg hover:bg-green-100">
+                                <i class="fas fa-download mr-2"></i> Download
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Reference Architecture -->
+                {% if reference_architecture_path %}
+                <div class="file-card architecture-card glass-card p-6 hover:shadow-xl">
+                    <div class="flex items-center justify-between flex-wrap">
+                        <div class="flex items-center">
+                            <div class="bg-yellow-100 p-3 rounded-lg mr-4">
+                                <i class="fas fa-sitemap text-yellow-600 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-800">Architecture Diagram</h3>
+                                <p class="text-sm text-gray-500">System framework illustration</p>
+                            </div>
+                        </div>
+                        <div class="flex space-x-3 mt-4 sm:mt-0 file-card-actions">
+                            <a href="{{ url_for('view_document', doc_id=reference_architecture_id) }}" target="_blank"
+                                class="btn inline-flex items-center px-4 py-2 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100">
+                                <i class="fas fa-eye mr-2"></i> View
+                            </a>
+                            <a href="{{ url_for('diagram_editor') }}"
+                                class="btn inline-flex items-center px-4 py-2 bg-red-50 text-red-500 rounded-lg hover:bg-red-100 mr-2">
+                                <i class="fas fa-edit mr-2"></i> Editor
+                            </a>
+                            <a href="{{ url_for('download_document', doc_id=reference_architecture_id) }}"
+                                class="btn inline-flex items-center px-4 py-2 bg-green-50 text-green-700 rounded-lg hover:bg-green-100">
+                                <i class="fas fa-download mr-2"></i> Download
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            {% else %}
+            <div class="glass-card text-center py-12 animate-fade-in">
+                <div class="bg-red-50 border-l-4 border-red-500 p-6 rounded-lg">
+                    <div class="flex flex-wrap">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-exclamation-circle text-red-500 text-xl"></i>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-lg font-medium text-red-800">No Files Generated</h3>
+                            <p class="mt-2 text-red-700">Please try again or check the error messages above.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Generate Another Button -->
+        <div class="mt-10 text-center">
+            <a href="{{ url_for('index') }}"
+                class="btn inline-flex items-center px-6 py-3 gradient-primary text-white rounded-lg shadow-lg">
+                <i class="fas fa-plus mr-2"></i>
+                Generate Another Documentation
+            </a>
+        </div>
+    </main>
+
+    <!-- Footer with improved styling -->
+    <footer class="py-6 border-t border-gray-200">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <a href="/" class="flex items-center space-x-2">
+                        <img src="{{ url_for('static', filename='images/Yash_Logo.png') }}" alt="YCAT Logo" class="h-8">
+                        <span class="text-md font-semibold text-gray-800">DocWriter Tool</span>
+                    </a>
+                </div>
+                <div class="text-gray-500 text-sm">
+                    <p>© 2025 DocWriter Tool. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript for navbar scroll effect and animations -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Navbar scroll effect
+            const navbar = document.querySelector('.navbar');
+
+            window.addEventListener('scroll', function () {
+                if (window.scrollY > 10) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+
+            // Optional: Add animation to cards on scroll
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.1
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animate-fade-in');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.file-card').forEach(card => {
+                observer.observe(card);
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,14 @@
+{
+  "include_overview": true,
+  "include_executive_summary": true,
+  "include_tech_stack": true,
+  "include_code_structure": false,
+  "include_features": true,
+  "include_dependencies": true,
+  "include_issues": true,
+  "include_sql_objects": true,
+  "include_class_diagram": true,
+  "include_flow_diagram": true,
+  "include_er_diagram": true,
+  "include_reference_architecture": true
+}

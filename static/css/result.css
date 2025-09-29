@@ -1,0 +1,244 @@
+ /* Theme variables */
+ :root {
+    --primary-color: #4218EE;
+    --secondary-color: #3f37c9;
+    --accent-color: #f72585;
+    --light-color: #f8f9fa;
+    --dark-color: #212529;
+    --border-radius: 15px;
+    --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    --font-heading: 'Inter', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-weight-light: 300;
+    --font-weight-regular: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+}
+
+/* Performance optimizations */
+html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Glassmorphism background effects - optimized */
+body {
+    font-family: var(--font-body);
+    font-weight: var(--font-weight-regular);
+    line-height: 1.6;
+    color: rgba(0, 0, 0, 0.85);
+    background: linear-gradient(135deg, #D6E4F0 0%, #F5F2E8 100%) fixed;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+}
+
+/* Optimized floating elements */
+body::before,
+body::after {
+    content: '';
+    position: fixed;
+    /* Changed from absolute to fixed */
+    border-radius: 50%;
+    background: rgba(66, 24, 238, 0.1);
+    z-index: -1;
+    will-change: transform;
+    /* Optimize animations */
+}
+
+body::before {
+    width: 300px;
+    height: 300px;
+    top: -100px;
+    right: -50px;
+    animation: float 15s infinite alternate ease-in-out;
+}
+
+body::after {
+    width: 450px;
+    height: 450px;
+    bottom: -150px;
+    left: -100px;
+    animation: float 20s infinite alternate-reverse ease-in-out;
+}
+
+@keyframes float {
+    0% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+
+    100% {
+        transform: translate(50px, 50px) rotate(15deg);
+    }
+}
+
+/* Main content wrapper */
+.main-content {
+    flex: 1;
+    width: 100%;
+    position: relative;
+    z-index: 1;
+}
+
+/* Topography background pattern - optimized */
+.topography-pattern::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%234218EE' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+    opacity: 0.3;
+    pointer-events: none;
+    /* Improve performance */
+}
+
+/* Glassmorphism cards - optimized */
+.glass-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    will-change: transform;
+    /* Optimize animations */
+}
+
+/* Base animations and transitions - optimized */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+/* Animations and transitions */
+.animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+.animate-pulse-gentle {
+    animation: pulse 2s infinite;
+}
+
+.stagger-animation>* {
+    opacity: 0;
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Navbar and branding - optimized */
+.navbar {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+    will-change: transform;
+    /* Optimize animations */
+}
+
+/* Footer - fixed height and position */
+footer {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255, 255, 255, 0.4);
+    width: 100%;
+    flex-shrink: 0;
+    z-index: 10;
+}
+
+/* Modal styling - optimized */
+.modal-backdrop {
+    backdrop-filter: blur(5px);
+    transition: all 0.3s ease;
+}
+
+.modal-content {
+    transition: all 0.3s ease;
+    will-change: transform, opacity;
+}
+
+/* Performance optimizations for cards */
+.file-card {
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease;
+    will-change: transform, box-shadow;
+}
+
+/* Remove blur effects on mobile for better performance */
+@media (max-width: 768px) {
+
+    .glass-card,
+    .navbar,
+    footer {
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        background: rgba(255, 255, 255, 0.95);
+    }
+
+    body::before,
+    body::after {
+        display: none;
+    }
+}
+
+/* Rest of your existing styles... */
+.file-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+}
+
+.file-card.markdown-card {
+    border-left-color: var(--primary-color);
+}
+
+.file-card.pdf-card {
+    border-left-color: var(--danger);
+}
+
+.file-card.diagram-card {
+    border-left-color: var(--secondary-color);
+}
+
+.file-card.architecture-card {
+    border-left-color: var(--warning);
+}
+
+.btn {
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.gradient-primary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+}
+

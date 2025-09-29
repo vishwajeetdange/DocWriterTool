@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DocWriter Editor Pro</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/YCAT_Logo.png') }}" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.2/ace.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.2/mode-markdown.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.2/theme-monokai.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.8.0/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #0b1d42;
+            --secondary-color: #4f46e5;
+            --accent-color: #ec4899;
+            --success-color: #22c55e;
+            --bg-color: #f8fafc;
+            --text-color: #1e293b;
+            --border-color: #e2e8f0;
+            --hover-color: #f1f5f9;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, var(--bg-color), #e0e7ff);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+            min-height: 100vh;
+        }
+
+        body.dark-mode {
+            --bg-color: #0f172a;
+            --text-color: #f1f5f9;
+            --border-color: #1e293b;
+            --hover-color: #1e293b;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            padding: 0.1rem;
+            box-shadow: var(--box-shadow);
+            backdrop-filter: blur(10px);
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            color: white !important;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .main-container {
+            display: grid;
+            grid-template-columns: 30% 70%;
+            gap: 1rem;
+            padding: 1rem;
+            height: calc(100vh - 150px);
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            box-shadow: var(--box-shadow);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+        }
+
+        .dark-mode .panel {
+            background: rgba(15, 23, 42, 0.95);
+        }
+
+        .panel-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #editor {
+            flex: 1;
+            font-size: 13px;
+        }
+
+        .preview-container {
+            overflow: hidden;
+            position: relative;
+            width: 100%;
+            height: 100%;
+            flex: 1;
+        }
+
+        .preview-content {
+            position: absolute;
+            transform-origin: 0 0;
+            transition: transform 0.1s ease;
+            width: 100%;
+            height: 100%;
+            padding: 1rem;
+        }
+
+        .toolbar {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 8px;
+            margin: 0.75rem;
+            padding: 0.75rem;
+            box-shadow: var(--box-shadow);
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .dark-mode .toolbar {
+            background: rgba(15, 23, 42, 0.95);
+        }
+
+        .pan-zoom-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            border-radius: 8px;
+            padding: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: var(--box-shadow);
+        }
+
+        .dark-mode .pan-zoom-controls {
+            background: rgba(15, 23, 42, 0.9);
+            color: white;
+        }
+
+        .switch-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: var(--primary-color);
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(24px);
+        }
+
+        .zoom-controls {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .btn-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-icon:hover {
+            transform: scale(1.1);
+            background: var(--secondary-color);
+        }
+
+        .status-bar {
+            background: var(--bg-color);
+            padding: 0.5rem 1rem;
+            font-size: 0.75rem;
+            color: var(--text-color);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            color: white;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transform: translateY(100%);
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            opacity: 0;
+        }
+
+        .notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .logo-container {
+            height: 50px;
+            width: auto;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-container img {
+            height: 100%;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #1e9c5e;
+            border-color: #1e9c5e;
+        }
+
+        .file-upload-container {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .file-upload-container input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .upload-btn {
+            display: inline-block;
+            background-color: #16006e;
+            color: white;
+            border: none;
+            padding: 0.375rem 0.75rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .upload-btn:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1050;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: var(--bg-color);
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: var(--box-shadow);
+            width: 80%;
+            max-width: 500px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 15px;
+            margin-top: 20px;
+        }
+
+        .close {
+            color: var(--text-color);
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: var(--accent-color);
+        }
+
+        /* Fullscreen Styles */
+        .panel.fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1000;
+            margin: 0;
+            border-radius: 0;
+        }
+
+        .panel.fullscreen .preview-container {
+            height: calc(100vh - 60px);
+        }
+
+        /* Add to your styles */
+        .mermaid-container {
+            position: relative;
+            min-height: 200px;
+        }
+
+        .mermaid-container .spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .alert-danger pre {
+            white-space: pre-wrap;
+            word-break: break-word;
+            font-size: 0.9em;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+
+            .panel {
+                height: 50vh;
+                margin-bottom: 1rem;
+            }
+
+            .toolbar {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 0.5rem;
+            }
+
+            .toolbar button,
+            .toolbar select {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+
+            .pan-zoom-controls {
+                top: 10px;
+                right: 10px;
+                border-radius: 8px;
+                padding: 0.5rem;
+            }
+
+            .btn-icon {
+                width: 48px;
+                height: 48px;
+            }
+
+            .navbar-brand {
+                font-size: 1.2rem;
+            }
+
+            .logo-container {
+                height: 40px;
+            }
+
+            .preview-container {
+                overflow: auto;
+            }
+
+            .preview-content {
+                padding: 0.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .panel-header h5 {
+                font-size: 1rem;
+            }
+
+            .btn-icon {
+                width: 40px;
+                height: 40px;
+            }
+
+            .status-bar {
+                font-size: 0.65rem;
+            }
+
+            .notification {
+                bottom: 10px;
+                right: 10px;
+                padding: 0.5rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: var(--primary-color);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading .spinner {
+            display: inline-block;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <div class="logo-container">
+                    <img src="{{ url_for('static', filename='images/Yash_Logo.png') }}" alt="YCAT Logo">
+                </div>
+                Editor Pro
+            </a>
+            <div class="d-flex gap-2">
+                <button class="btn-icon" onclick="goBack()" title="Go Back">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <button class="btn-icon" onclick="toggleDarkMode()" title="Toggle Dark Mode">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="toolbar">
+        <button class="btn btn-primary" onclick="updateDiagram()" title="Generate Diagram">
+            <i class="fas fa-play me-2"></i>Generate
+        </button>
+        <button class="btn btn-success" onclick="saveDiagram()" title="Save Diagram">
+            <i class="fas fa-save me-2"></i>Save
+        </button>
+        <div class="file-upload-container">
+            <button class="btn btn-primary upload-btn" title="Upload File">
+                <i class="fas fa-upload me-2"></i>Upload File
+            </button>
+            <input type="file" id="fileUpload" accept=".md,.txt" onchange="handleFileUpload(this)">
+        </div>
+        <button class="btn btn-success" id="autoSyncButton" onclick="toggleAutoSync()" title="Toggle Auto-Sync">
+            <i class="fas fa-sync"></i> Auto-Sync
+        </button>
+
+    </div>
+
+    <div class="main-container">
+        <div class="panel">
+            <div class="panel-header">
+                <h5 class="m-0">
+                    <i class="fas fa-code me-2"></i>Editor
+                </h5>
+                <div class="d-flex gap-2">
+
+                    <button class="btn btn-light btn-sm" onclick="toggleEditorFullscreen()" title="Toggle Fullscreen">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="editor">classDiagram
+                class Animal {
+                +String name
+                +int age
+                +makeSound()
+                }
+                class Dog {
+                +String breed
+                +bark()
+                }
+                Animal <|-- Dog</div>
+                    <div class="status-bar">
+                        <span id="cursor-position">Line: 1, Column: 1</span>
+                        <span id="file-info">Auto-saved: Just now</span>
+                        <span id="word-count">Words: 0</span>
+                        <span id="char-count">Characters: 0</span>
+                    </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">
+                    <h5 class="m-0">
+                        <i class="fas fa-eye me-2"></i>Preview
+                    </h5>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-light btn-sm" onclick="exportJPEG()" title="Export JPEG">
+    <i class="fas fa-download"></i>
+</button>
+                        <button class="btn btn-light btn-sm" onclick="togglePreviewFullscreen()"
+                            title="Toggle Fullscreen">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="preview-container">
+                    <div class="preview-content" id="previewContent"></div>
+                    <div class="pan-zoom-controls">
+                        <div class="switch-container">
+                            <label class="switch">
+                                <input type="checkbox" id="panZoomToggle" onchange="togglePanZoom()" checked>
+                                <span class="slider"></span>
+                            </label>
+                            <span>Pan & Zoom</span>
+                        </div>
+                        <div class="zoom-controls">
+                            <button class="btn-icon" onclick="zoomIn()" title="Zoom In">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                            <button class="btn-icon" onclick="zoomOut()" title="Zoom Out">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <button class="btn-icon" onclick="resetView()" title="Reset View">
+                                <i class="fas fa-sync"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- File Upload Confirmation Modal -->
+        <div id="uploadModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4>File Upload</h4>
+                    <span class="close" onclick="closeModal()">&times;</span>
+                </div>
+                <div id="modalContent">
+                    <p>Do you want to replace the current editor content with the uploaded file?</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button class="btn btn-primary" id="confirmUpload">Confirm</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="notification" class="notification"></div>
+
+        <script>
+            // Initialize variables
+            let editor = ace.edit("editor");
+            let isPanZoomEnabled = true;
+            let isDragging = false;
+            let scale = 1;
+            let translateX = 0;
+            let translateY = 0;
+            let startX, startY;
+            let autoSync = true;
+            let fileContent = null;
+
+            // Initialize editor
+            editor.setTheme("ace/theme/monokai");
+            editor.session.setMode("ace/mode/markdown");
+            editor.setOptions({
+                fontSize: "13px",
+                showPrintMargin: false,
+                showGutter: true,
+                enableBasicAutocompletion: true,
+                enableLiveAutocompletion: true,
+                enableSnippets: true
+            });
+
+            // Replace the current mermaid.initialize call with:
+            mermaid.initialize({
+                startOnLoad: false,
+                securityLevel: 'loose',
+                theme: 'default',
+                fontFamily: 'inherit',
+                flowchart: {
+                    curve: 'basis',
+                    htmlLabels: true
+                }
+                ,
+                sequence: {
+                    diagramMarginX: 50,
+                    diagramMarginY: 10,
+                    actorMargin: 50,
+                    width: 150,
+                    height: 65,
+                    boxMargin: 10,
+                    boxTextMargin: 5,
+                    noteMargin: 10,
+                    messageMargin: 35,
+                    mirrorActors: true,
+                    bottomMarginAdj: 1,
+                    useMaxWidth: true,
+                    rightAngles: false,
+                    showSequenceNumbers: false
+                },
+                gantt: {
+                    titleTopMargin: 25,
+                    barHeight: 20,
+                    barGap: 4,
+                    topPadding: 50,
+                    leftPadding: 75,
+                    gridLineStartPadding: 35,
+                    fontSize: 11,
+                    fontFamily: '"Open-Sans", "sans-serif"',
+                    numberSectionStyles: 4,
+                    axisFormat: '%Y-%m-%d',
+                    topAxis: false
+                }
+            });
+
+            function goBack() {
+                try {
+                    // Check if there's a previous page in browser history
+                    if (window.history.length > 1) {
+                        window.history.back();
+                    } else {
+                        // If no history exists, show a notification
+                        showNotification('No previous page in history', 'info');
+                    }
+                } catch (error) {
+                    console.error("Error navigating back:", error);
+                    showNotification('Error navigating back: ' + error.message, 'error');
+                }
+            }
+
+            // Editor event listeners
+            editor.session.on('change', () => {
+                updateCursorInfo();
+                updateWordCount();
+                autoSave();
+                if (autoSync) {
+                    clearTimeout(window.autoSyncTimeout);
+                    window.autoSyncTimeout = setTimeout(updateDiagram, 500);
+                }
+            });
+
+            editor.session.selection.on('changeCursor', updateCursorInfo);
+
+            function updateCursorInfo() {
+                const pos = editor.getCursorPosition();
+                document.getElementById('cursor-position').textContent =
+                    `Line: ${pos.row + 1}, Column: ${pos.column + 1}`;
+            }
+
+            function updateWordCount() {
+                const text = editor.getValue();
+                const words = text.split(/\s+/).filter(word => word.length > 0).length;
+                const chars = text.length;
+                document.getElementById('word-count').textContent = `Words: ${words}`;
+                document.getElementById('char-count').textContent = `Characters: ${chars}`;
+            }
+
+            function togglePanZoom() {
+                isPanZoomEnabled = document.getElementById('panZoomToggle').checked;
+                const previewContainer = document.querySelector('.preview-container');
+                previewContainer.style.cursor = isPanZoomEnabled ? 'grab' : 'default';
+                showNotification(`Pan & Zoom mode ${isPanZoomEnabled ? 'enabled' : 'disabled'}!`, 'info');
+            }
+
+            function updatePreviewTransform() {
+                const content = document.getElementById('previewContent');
+                content.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+            }
+
+            function zoomIn() {
+                if (!isPanZoomEnabled) return;
+                scale = Math.min(scale * 1.2, 5);
+                updatePreviewTransform();
+            }
+
+            function zoomOut() {
+                if (!isPanZoomEnabled) return;
+                scale = Math.max(scale / 1.2, 0.2);
+                updatePreviewTransform();
+            }
+
+            function resetView() {
+                scale = 1;
+                translateX = 0;
+                translateY = 0;
+                updatePreviewTransform();
+            }
+
+            function updateDiagram() {
+                try {
+                    let diagramCode = editor.getValue();
+
+                    // Pre-process the diagram code to handle empty classes
+                    diagramCode = diagramCode.replace(/class\s+([A-Za-z_][A-Za-z0-9_]*)\s*\{\s*\}/g, 'class $1');
+
+                    const previewContent = document.getElementById('previewContent');
+                    previewContent.innerHTML = '';
+                    previewContent.classList.add('loading');
+
+                    const container = document.createElement('div');
+                    container.className = 'mermaid-container';
+                    previewContent.appendChild(container);
+
+                    const spinner = document.createElement('div');
+                    spinner.className = 'spinner';
+                    container.appendChild(spinner);
+
+                    mermaid.initialize({
+                        startOnLoad: false,
+                        theme: document.body.classList.contains('dark-mode') ? 'dark' : 'default',
+                        securityLevel: 'loose'
+                    });
+
+                    mermaid.parse(diagramCode).then(() => {
+                        container.innerHTML = diagramCode;
+                        return mermaid.run({
+                            nodes: [container],
+                            suppressErrors: false
+                        });
+                    }).then(() => {
+                        previewContent.classList.remove('loading');
+                        showNotification('Diagram updated successfully!', 'success');
+                        resetView();
+                    }).catch(error => {
+                        previewContent.classList.remove('loading');
+                        console.error("Mermaid render error:", error);
+
+                        // Enhanced error handling for empty classes
+                        let errorMessage = error.str || error.message || "Unknown error rendering diagram";
+                        if (errorMessage.includes("empty") || errorMessage.includes("no content")) {
+                            errorMessage = "Empty classes are allowed. You can leave them blank or add members later.";
+                        }
+
+                        container.innerHTML = `
+                        <div class="alert alert-danger p-3">
+                            <h4 class="mb-2">Rendering Error</h4>
+                            <p class="mb-1"><strong>Error:</strong> ${errorMessage}</p>
+                            ${error.hash ? `<p class="mb-1"><strong>Location:</strong> Line ${error.hash.line}</p>` : ''}
+                            <pre class="mt-2 p-2 bg-dark text-light rounded">${diagramCode}</pre>
+                        </div>
+                    `;
+                    });
+
+                    updatePreviewTransform();
+                } catch (error) {
+                    console.error("Error in updateDiagram:", error);
+                    showNotification('Error updating diagram: ' + error.message, 'error');
+                }
+            }
+
+            function formatCode() {
+                try {
+                    const code = editor.getValue();
+                    editor.setValue(code.trim(), -1);
+                    showNotification('Code formatted successfully!', 'success');
+                } catch (error) {
+                    showNotification('Error formatting code', 'error');
+                }
+            }
+
+            function toggleEditorFullscreen() {
+                const panel = document.querySelector('.panel:first-child');
+                panel.classList.toggle('fullscreen');
+                if (panel.classList.contains('fullscreen')) {
+                    panel.style.position = 'fixed';
+                    panel.style.top = '0';
+                    panel.style.left = '0';
+                    panel.style.width = '100vw';
+                    panel.style.height = '100vh';
+                    panel.style.zIndex = '1000';
+                } else {
+                    panel.style.position = '';
+                    panel.style.top = '';
+                    panel.style.left = '';
+                    panel.style.width = '';
+                    panel.style.height = '';
+                    panel.style.zIndex = '';
+                }
+            }
+
+            function togglePreviewFullscreen() {
+                const previewPanel = document.querySelector('.panel:nth-child(2)');
+                if (!document.fullscreenElement) {
+                    if (previewPanel.requestFullscreen) {
+                        previewPanel.requestFullscreen();
+                    } else if (previewPanel.mozRequestFullScreen) { // Firefox
+                        previewPanel.mozRequestFullScreen();
+                    } else if (previewPanel.webkitRequestFullscreen) { // Chrome, Safari, and Opera
+                        previewPanel.webkitRequestFullscreen();
+                    } else if (previewPanel.msRequestFullscreen) { // IE/Edge
+                        previewPanel.msRequestFullscreen();
+                    }
+                } else {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    } else if (document.mozCancelFullScreen) { // Firefox
+                        document.mozCancelFullScreen();
+                    } else if (document.webkitExitFullscreen) { // Chrome, Safari, and Opera
+                        document.webkitExitFullscreen();
+                    } else if (document.msExitFullscreen) { // IE/Edge
+                        document.msExitFullscreen();
+                    }
+                }
+            }
+
+            // Handle fullscreen change events
+            document.addEventListener('fullscreenchange', handleFullscreenChange);
+            document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+            document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+            document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+
+            function handleFullscreenChange() {
+                const previewPanel = document.querySelector('.panel:nth-child(2)');
+                if (document.fullscreenElement) {
+                    previewPanel.classList.add('fullscreen');
+                } else {
+                    previewPanel.classList.remove('fullscreen');
+                }
+            }
+
+            function saveDiagram() {
+                const diagramCode = editor.getValue();
+                localStorage.setItem('savedDiagram', diagramCode);
+                showNotification('Diagram saved successfully!', 'success');
+            }
+
+            function shareLink() {
+                const diagramCode = editor.getValue();
+                const encodedDiagram = encodeURIComponent(diagramCode);
+                const url = `${window.location.href}?diagram=${encodedDiagram}`;
+
+                navigator.clipboard.writeText(url).then(() => {
+                    showNotification('Share link copied to clipboard!', 'success');
+                });
+            }
+            function exportJPEG() {
+    const svgElement = document.querySelector('#previewContent svg');
+    if (!svgElement) {
+        showNotification('No diagram to export!', 'error');
+        return;
+    }
+
+    // Show loading indicator
+    const loadingNotification = showNotification('Generating high-quality JPEG...', 'info', true);
+
+    // Create a clone of the SVG to ensure we capture all styles
+    const clone = svgElement.cloneNode(true);
+    clone.style.width = svgElement.clientWidth + 'px';
+    clone.style.height = svgElement.clientHeight + 'px';
+    
+    // Create a temporary container for the clone
+    const tempContainer = document.createElement('div');
+    tempContainer.style.position = 'absolute';
+    tempContainer.style.left = '-9999px';
+    tempContainer.style.backgroundColor = document.body.classList.contains('dark-mode') ? '#0f172a' : 'white';
+    tempContainer.appendChild(clone);
+    document.body.appendChild(tempContainer);
+
+    // Set higher resolution (4x for high quality)
+    const scaleFactor = 4;
+    
+    // Use html2canvas to convert to canvas
+    html2canvas(tempContainer, {
+        scale: scaleFactor,
+        backgroundColor: document.body.classList.contains('dark-mode') ? '#0f172a' : 'white',
+        logging: false,
+        useCORS: true,
+        allowTaint: true,
+        onclone: (document) => {
+            // Ensure the clone is visible during capture
+            const clonedSvg = document.querySelector('svg');
+            if (clonedSvg) {
+                clonedSvg.style.width = (svgElement.clientWidth * scaleFactor) + 'px';
+                clonedSvg.style.height = (svgElement.clientHeight * scaleFactor) + 'px';
+            }
+        }
+    }).then(canvas => {
+        // Remove the temporary container
+        document.body.removeChild(tempContainer);
+        
+        // Convert canvas to JPEG
+        const jpegData = canvas.toDataURL('image/jpeg', 1.0); // Highest quality
+        
+        // Create download link
+        const a = document.createElement('a');
+        a.href = jpegData;
+        a.download = 'diagram.jpg';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        
+        showNotification('High-quality JPEG exported successfully!', 'success');
+    }).catch(error => {
+        console.error("Error exporting JPEG:", error);
+        showNotification('Error exporting JPEG: ' + error.message, 'error');
+        document.body.removeChild(tempContainer);
+    });
+}
+function showNotification(message, type = 'info', persistent = false) {
+    const notification = document.getElementById('notification');
+    notification.textContent = message;
+    notification.className = `notification show bg-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'}`;
+    
+    if (!persistent) {
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                notification.textContent = '';
+                notification.className = 'notification';
+            }, 300);
+        }, 3000);
+    }
+    
+    return notification;
+}
+
+            function exportSVG() {
+                const svgElement = document.querySelector('#previewContent svg');
+                if (!svgElement) {
+                    showNotification('No diagram to export!', 'error');
+                    return;
+                }
+                const serializer = new XMLSerializer();
+                const svgData = serializer.serializeToString(svgElement);
+                const blob = new Blob([svgData], { type: 'image/svg+xml' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'diagram.svg';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showNotification('SVG exported successfully!', 'success');
+            }
+
+            function changeMermaidTheme(theme) {
+                mermaid.initialize({ theme });
+                updateDiagram();
+                showNotification(`Theme changed to ${theme}!`, 'info');
+            }
+
+            function toggleDarkMode() {
+                document.body.classList.toggle('dark-mode');
+                const icon = document.querySelector('.btn-icon i');
+                icon.classList.toggle('fa-moon');
+                icon.classList.toggle('fa-sun');
+                showNotification('Theme toggled!', 'info');
+            }
+
+            function toggleAutoSync() {
+                autoSync = !autoSync;
+                const autoSyncButton = document.getElementById('autoSyncButton');
+                autoSyncButton.classList.toggle('btn-light', !autoSync);
+                autoSyncButton.classList.toggle('btn-success', autoSync);
+                showNotification(`Auto-Sync ${autoSync ? 'enabled' : 'disabled'}!`, 'info');
+            }
+
+            function showNotification(message, type = 'info') {
+                const notification = document.getElementById('notification');
+                notification.textContent = message;
+                notification.className = `notification show bg-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'}`;
+
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                    setTimeout(() => {
+                        notification.textContent = '';
+                        notification.className = 'notification';
+                    }, 300);
+                }, 3000);
+            }
+
+            function autoSave() {
+                clearTimeout(window.autoSaveTimeout);
+                window.autoSaveTimeout = setTimeout(() => {
+                    localStorage.setItem('lastDiagram', editor.getValue());
+                    document.getElementById('file-info').textContent =
+                        `Auto-saved: ${new Date().toLocaleTimeString()}`;
+                }, 1000);
+            }
+
+            // File Upload Handling
+            function handleFileUpload(input) {
+                const file = input.files[0];
+                if (!file) return;
+
+                // Display file name
+                const fileName = file.name;
+                document.getElementById('modalContent').innerHTML = `
+                <p>Do you want to replace the current editor content with the uploaded file?</p>
+                <p><strong>File:</strong> ${fileName}</p>
+            `;
+
+                // Read file content
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    fileContent = e.target.result;
+
+                    // Show modal for confirmation
+                    openModal();
+                };
+
+                reader.onerror = function () {
+                    showNotification('Error reading file!', 'error');
+                };
+
+                reader.readAsText(file);
+            }
+
+            function openModal() {
+                const modal = document.getElementById('uploadModal');
+                modal.style.display = 'block';
+
+                // Set up confirm button
+                document.getElementById('confirmUpload').onclick = function () {
+                    if (fileContent) {
+                        editor.setValue(fileContent, -1);
+                        updateDiagram();
+                        showNotification('File uploaded and loaded successfully!', 'success');
+                        fileContent = null;
+                    }
+                    closeModal();
+                };
+            }
+
+            function closeModal() {
+                const modal = document.getElementById('uploadModal');
+                modal.style.display = 'none';
+
+                // Reset file input
+                document.getElementById('fileUpload').value = '';
+            }
+
+            // Pan and Zoom Event Listeners
+            const previewContainer = document.querySelector('.preview-container');
+
+            previewContainer.addEventListener('mousedown', (e) => {
+                if (!isPanZoomEnabled) return;
+                isDragging = true;
+                startX = e.clientX - translateX;
+                startY = e.clientY - translateY;
+                e.preventDefault();
+                previewContainer.style.cursor = 'grabbing';
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging || !isPanZoomEnabled) return;
+                translateX = e.clientX - startX;
+                translateY = e.clientY - startY;
+                updatePreviewTransform();
+                e.preventDefault();
+            });
+
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+                if (isPanZoomEnabled) {
+                    previewContainer.style.cursor = 'grab';
+                }
+            });
+
+            previewContainer.addEventListener('wheel', (e) => {
+                if (!isPanZoomEnabled) return;
+                e.preventDefault();
+                const delta = e.deltaY > 0 ? 0.9 : 1.1;
+                scale = Math.max(0.2, Math.min(5, scale * delta));
+                updatePreviewTransform();
+            });
+
+            // Touch Event Listeners for Mobile
+            previewContainer.addEventListener('touchstart', (e) => {
+                if (!isPanZoomEnabled) return;
+                isDragging = true;
+                startX = e.touches[0].clientX - translateX;
+                startY = e.touches[0].clientY - translateY;
+                e.preventDefault();
+                previewContainer.style.cursor = 'grabbing';
+            });
+
+            document.addEventListener('touchmove', (e) => {
+                if (!isDragging || !isPanZoomEnabled) return;
+                translateX = e.touches[0].clientX - startX;
+                translateY = e.touches[0].clientY - startY;
+                updatePreviewTransform();
+                e.preventDefault();
+            });
+
+            document.addEventListener('touchend', () => {
+                isDragging = false;
+                if (isPanZoomEnabled) {
+                    previewContainer.style.cursor = 'grab';
+                }
+            });
+
+            // Pinch-to-Zoom for Mobile
+            let initialDistance = null;
+
+            previewContainer.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 2) {
+                    initialDistance = Math.hypot(
+                        e.touches[0].clientX - e.touches[1].clientX,
+                        e.touches[0].clientY - e.touches[1].clientY
+                    );
+                }
+            });
+
+            previewContainer.addEventListener('touchmove', (e) => {
+                if (e.touches.length === 2 && initialDistance !== null) {
+                    e.preventDefault();
+                    const currentDistance = Math.hypot(
+                        e.touches[0].clientX - e.touches[1].clientX,
+                        e.touches[0].clientY - e.touches[1].clientY
+                    );
+                    const scaleFactor = currentDistance / initialDistance;
+                    scale = Math.max(0.2, Math.min(5, scale * scaleFactor));
+                    initialDistance = currentDistance;
+                    updatePreviewTransform();
+                }
+            });
+
+            previewContainer.addEventListener('touchend', () => {
+                initialDistance = null;
+            });
+
+            // Modal Close Events
+            window.onclick = function (event) {
+                const modal = document.getElementById('uploadModal');
+                if (event.target === modal) {
+                    closeModal();
+                }
+            };
+
+            // Load saved diagram from localStorage
+            window.onload = function () {
+                const savedDiagram = localStorage.getItem('savedDiagram');
+                if (savedDiagram) {
+                    editor.setValue(savedDiagram, -1);
+                    updateDiagram();
+                }
+
+                // Load diagram from URL parameter
+                const urlParams = new URLSearchParams(window.location.search);
+                const diagramParam = urlParams.get('diagram');
+                if (diagramParam) {
+                    const diagramCode = decodeURIComponent(diagramParam);
+                    editor.setValue(diagramCode, -1);
+                    updateDiagram();
+                }
+            };
+
+            // Prevent default behavior for touch events
+            document.addEventListener('touchstart', function (e) {
+                if (e.touches.length > 1) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+
+            document.addEventListener('touchmove', function (e) {
+                if (e.touches.length > 1) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+
+            // Prevent context menu on preview container
+            previewContainer.addEventListener('contextmenu', function (e) {
+                e.preventDefault();
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', function (e) {
+                if (e.ctrlKey || e.metaKey) {
+                    switch (e.key) {
+                        case 's':
+                            e.preventDefault();
+                            saveDiagram();
+                            break;
+                        case 'e':
+                            e.preventDefault();
+                            exportSVG();
+                            break;
+                        case 'f':
+                            e.preventDefault();
+                            formatCode();
+                            break;
+                        case 'd':
+                            e.preventDefault();
+                            toggleDarkMode();
+                            break;
+                        case 'z':
+                            if (e.shiftKey) {
+                                e.preventDefault();
+                                zoomIn();
+                            } else {
+                                e.preventDefault();
+                                zoomOut();
+                            }
+                            break;
+                        case 'r':
+                            e.preventDefault();
+                            resetView();
+                            break;
+                    }
+                }
+            });
+
+            // Initialize the diagram on page load
+            updateDiagram();
+        </script>
+</body>
+
+</html>

@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation Configuration</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/YCAT_Logo.png') }}" />
+
+    <!-- Improved favicon implementation -->
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='images/YCAT_Logo.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='images/YCAT_Logo.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='images/YCAT_Logo.png') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="static/css/styles.css">
+    <style>
+        :root {
+            --primary-color: #4218EE;
+            --secondary-color: #3f37c9;
+            --accent-color: #f72585;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --border-radius: 15px;
+            --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            --font-heading: 'Inter', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --font-weight-light: 300;
+            --font-weight-regular: 400;
+            --font-weight-medium: 500;
+            --font-weight-semibold: 600;
+            --font-weight-bold: 700;
+        }
+
+        body {
+            font-family: var(--font-body);
+            font-weight: var(--font-weight-regular);
+            line-height: 1.6;
+            color: rgba(0, 0, 0, 0.85);
+            background: linear-gradient(135deg, #D6E4F0 0%, #F5F2E8 100%);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism floating elements */
+        body::before,
+        body::after {
+            content: '';
+            position: fixed;
+            border-radius: 50%;
+            background: rgba(66, 24, 238, 0.1);
+            backdrop-filter: blur(15px);
+            z-index: -1;
+        }
+
+        body::before {
+            width: 300px;
+            height: 300px;
+            top: -100px;
+            right: -50px;
+            animation: float 15s infinite alternate ease-in-out;
+        }
+
+        body::after {
+            width: 450px;
+            height: 450px;
+            bottom: -150px;
+            left: -100px;
+            animation: float 20s infinite alternate-reverse ease-in-out;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            100% {
+                transform: translate(50px, 50px) rotate(15deg);
+            }
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-container img {
+            height: 40px;
+            margin-right: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .logo-container img:hover {
+            transform: scale(1.05);
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+
+        .config-card {
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            border: none;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+
+        .config-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .config-header {
+            background-color: rgba(248, 249, 250, 0.8);
+            padding: 15px;
+            border-bottom: 1px solid rgba(233, 236, 239, 0.5);
+            cursor: pointer;
+        }
+
+        .form-switch {
+            padding-left: 2.5em;
+        }
+
+        .form-check-input {
+            cursor: pointer;
+        }
+
+        .form-check-input:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .save-btn {
+            margin-top: 20px;
+        }
+
+        .alert-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            max-width: 350px;
+        }
+
+        .card-header {
+            background-color: rgba(248, 249, 250, 0.8);
+            border-bottom: 1px solid rgba(233, 236, 239, 0.5);
+            padding: 1rem 1.5rem;
+        }
+
+        .card-title {
+            margin-bottom: 0;
+            font-weight: var(--font-weight-semibold);
+            display: flex;
+            align-items: center;
+            color: #333;
+            font-family: var(--font-heading);
+        }
+
+        .card-title i {
+            margin-right: 10px;
+            color: var(--primary-color);
+        }
+
+        /* Form elements styling */
+        .form-label {
+            font-family: var(--font-body);
+            font-weight: var(--font-weight-medium);
+            color: rgba(0, 0, 0, 0.8);
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+            letter-spacing: 0.2px;
+        }
+
+        .form-control {
+            font-family: var(--font-body);
+            font-weight: var(--font-weight-regular);
+            font-size: 0.95rem;
+            letter-spacing: 0.1px;
+            padding: 12px 15px;
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(66, 24, 238, 0.2);
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Custom button styling */
+        .btn-primary {
+            font-family: var(--font-heading);
+            font-weight: var(--font-weight-semibold);
+            letter-spacing: 0.3px;
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 12px 20px;
+            border-radius: var(--border-radius);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(66, 24, 238, 0.3);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(66, 24, 238, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-outline-secondary {
+            font-family: var(--font-heading);
+            font-weight: var(--font-weight-medium);
+            border-radius: var(--border-radius);
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-secondary:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Custom Modal Styling */
+        .custom-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+            animation: modalFadeIn 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            background-color: rgba(248, 249, 250, 0.8);
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(233, 236, 239, 0.5);
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .modal-footer {
+            padding: 15px 20px;
+            border-top: 1px solid rgba(233, 236, 239, 0.5);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        /* Alert Styling */
+        .alert {
+            font-family: var(--font-body);
+            font-weight: var(--font-weight-medium);
+            font-size: 0.9rem;
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-bottom: 25px;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            animation: fadeInAlert 0.5s ease-in-out;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        @keyframes fadeInAlert {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Button size adjustments */
+        .action-btn {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        /* Language selector styles */
+        .language-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .language-btn {
+            padding: 8px 15px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(66, 24, 238, 0.2);
+            transition: all 0.3s ease;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .language-btn:hover {
+            background: rgba(66, 24, 238, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .language-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 10px rgba(66, 24, 238, 0.2);
+        }
+
+        /* Language config content */
+        .language-config-content {
+            display: none;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
+        }
+
+        .language-config-content.active {
+            display: block;
+        }
+
+        /* Horizontal layout for language config */
+        .language-config-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .language-config-col {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        /* Collapsible card styles */
+        .collapsible-card {
+            margin-bottom: 20px;
+        }
+
+        .collapsible-card .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .collapsible-card .card-header:after {
+            content: '\f078';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            transition: transform 0.3s ease;
+        }
+
+        .collapsible-card.collapsed .card-header:after {
+            transform: rotate(-90deg);
+        }
+
+        .collapsible-card .card-body {
+            display: block;
+        }
+
+        .collapsible-card.collapsed .card-body {
+            display: none;
+        }
+
+        /* Tab navigation cards */
+        .config-tabs {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .config-tab {
+            flex: 1;
+            max-width: 300px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: var(--border-radius);
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .config-tab:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .config-tab.active {
+            background: rgba(66, 24, 238, 0.1);
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 15px rgba(66, 24, 238, 0.2);
+        }
+
+        .config-tab i {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .config-tab h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: var(--dark-color);
+        }
+
+        .config-tab p {
+            margin: 5px 0 0;
+            font-size: 0.9rem;
+            color: rgba(0, 0, 0, 0.7);
+        }
+
+        /* Config sections */
+        .config-section {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .config-section.active {
+            display: block;
+        }
+
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+            gap: 10px;
+        }
+
+        .checkbox-grid .form-check {
+            margin-bottom: 0;
+        }
+
+        /* Optional: Add hover effect to checkboxes */
+        .checkbox-grid .form-check:hover {
+            background-color: rgba(66, 24, 238, 0.05);
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
+        .user-welcome {
+    font-family: var(--font-body);
+    font-weight: var(--font-weight-medium);
+    color: var(--dark-color);
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1.25rem;
+    margin-right: 1rem;
+    border-radius: var(--border-radius);
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 3px 12px rgba(66, 24, 238, 0.08);
+    transition: all 0.3s ease;
+    min-width: -webkit-fill-available;
+    min-width: fit-content;
+    max-width: none;
+    white-space: nowrap;
+    overflow: visible;
+}
+
+.user-welcome:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(66, 24, 238, 0.12);
+}
+
+.user-welcome i {
+    color: var(--primary-color);
+    margin-right: 0.75rem;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.user-welcome span {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: nowrap;
+}
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <div class="logo-container">
+                    <img src="{{ url_for('static', filename='images/Yash_Logo.png') }}" alt="YCAT Logo">
+                    <span class="fw-bold" style="color: #4218EE;">DocWriter Tool</span>
+                </div>
+            </a>
+
+            <div class="ms-auto d-flex align-items-center">
+                <div class="user-welcome d-none d-md-flex">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Welcome, {{ current_user.name }}</span>
+                </div>
+                <a href="/" class="btn btn-outline-primary me-2">
+                    <i class="fas fa-home"></i> Home
+                </a>
+                <a href="{{ url_for('logout') }}" class="btn btn-outline-danger">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <div class="content-wrapper">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            <!-- Tab Navigation Cards -->
+            <div class="config-tabs">
+                <div class="config-tab active" data-tab="doc-config">
+                    <i class="fas fa-cog"></i>
+                    <h3>Documentation Configuration</h3>
+                    <p>Configure documentation content and settings</p>
+                </div>
+                <div class="config-tab" data-tab="lang-config">
+                    <i class="fa-solid fa-file-code"></i>
+                    <h3>Language Configurations</h3>
+                    <p>Set up language-specific analysis</p>
+                </div>
+            </div>
+
+            <!-- Documentation Configuration Section -->
+            <div id="doc-config-section" class="config-section active">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <i class="fas fa-cog"></i>
+                            Documentation Configuration
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info mb-4">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Configure which elements to include in your generated documentation. Changes will be applied
+                            to
+                            future documentation generations.
+                        </div>
+
+                        <form id="configForm" action="/save-config" method="post">
+                            <div class="card config-card collapsible-card">
+                                <div class="card-header config-header">
+                                    <h4 class="mb-0"><i class="fas fa-file-alt me-2"
+                                            style="color: #4218EE;"></i>Documentation Content Settings</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-check form-switch mb-3">
+                                                <input class="form-check-input" type="checkbox" id="include_overview"
+                                                    name="include_overview" checked>
+                                                <label class="form-check-label" for="include_overview">Include
+                                                    Overview</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-3">
+                                                <input class="form-check-input" type="checkbox"
+                                                    id="include_executive_summary" name="include_executive_summary">
+                                                <label class="form-check-label" for="include_executive_summary">Include
+                                                    Executive Summary</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-3">
+                                                <input class="form-check-input" type="checkbox" id="include_tech_stack"
+                                                    name="include_tech_stack" checked>
+                                                <label class="form-check-label" for="include_tech_stack">Include Tech
+                                                    Stack</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-3">
+                                                <input class="form-check-input" type="checkbox"
+                                                    id="include_code_structure" name="include_code_structure" checked>
+                                                <label class="form-check-label" for="include_code_structure">Include
+                                                    Code
+                                                    Structure</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-3">
+                                                <input class="form-check-input" type="checkbox" id="include_features"
+                                                    name="include_features" checked>
+                                                <label class="form-check-label" for="include_features">Include
+                                                    Features</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-check form-switch mb-3">
+                                                <input class="form-check-input" type="checkbox"
+                                                    id="include_dependencies" name="include_dependencies" checked>
+                                                <label class="form-check-label" for="include_dependencies">Include
+                                                    Dependencies</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-3">
+                                                <input class="form-check-input" type="checkbox" id="include_issues"
+                                                    name="include_issues" checked>
+                                                <label class="form-check-label" for="include_issues">Include
+                                                    Issues</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-3">
+                                                <input class="form-check-input" type="checkbox" id="include_sql_objects"
+                                                    name="include_sql_objects" checked>
+                                                <label class="form-check-label" for="include_sql_objects">Include SQL
+                                                    Objects</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card config-card collapsible-card">
+                                <div class="card-header config-header">
+                                    <h4 class="mb-0"><i class="fas fa-project-diagram me-2"
+                                            style="color: #4218EE;"></i>Diagram Settings</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-check form-switch mb-3">
+                                                <input class="form-check-input" type="checkbox"
+                                                    id="include_class_diagram" name="include_class_diagram" checked>
+                                                <label class="form-check-label" for="include_class_diagram">Include
+                                                    Class
+                                                    Diagram</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-3">
+                                                <input class="form-check-input" type="checkbox"
+                                                    id="include_flow_diagram" name="include_flow_diagram" checked>
+                                                <label class="form-check-label" for="include_flow_diagram">Include Flow
+                                                    Diagram</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-check form-switch mb-3">
+                                                <input class="form-check-input" type="checkbox" id="include_er_diagram"
+                                                    name="include_er_diagram">
+                                                <label class="form-check-label" for="include_er_diagram">Include ER
+                                                    Diagram</label>
+                                            </div>
+                                            <div class="form-check form-switch mb-3">
+                                                <input class="form-check-input" type="checkbox"
+                                                    id="include_reference_architecture"
+                                                    name="include_reference_architecture" checked>
+                                                <label class="form-check-label"
+                                                    for="include_reference_architecture">Include
+                                                    Reference Architecture Diagram</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end save-btn">
+                                <button type="button" id="resetConfigBtn" class="btn btn-outline-secondary action-btn">
+                                    <i class="fas fa-undo me-1"></i> Reset to Defaults
+                                </button>
+                                <button type="submit" class="btn btn-primary action-btn">
+                                    <i class="fas fa-save me-1"></i> Save Configuration
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Language-Specific Configurations Section -->
+            <div id="lang-config-section" class="config-section">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <i class="fa-solid fa-file-code"></i>
+                            Language-Specific Configurations
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info mb-4">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Configure analysis settings for specific programming languages.
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            <button class="btn btn-outline-primary language-btn" data-lang="COBOL">COBOL</button>
+                            <button class="btn btn-outline-primary language-btn" data-lang="Java">Java</button>
+                            <button class="btn btn-outline-primary language-btn" data-lang="Python">Python</button>
+                            <button class="btn btn-outline-primary language-btn" data-lang="VB.NET">VB.NET</button>
+                            <button class="btn btn-outline-primary language-btn" data-lang="SQL">SQL</button>
+                            <button class="btn btn-outline-primary language-btn" data-lang="C">C</button>
+                            <button class="btn btn-outline-primary language-btn" data-lang="ABAP">ABAP</button>
+                            <button class="btn btn-outline-primary language-btn" data-lang="RPG">RPG</button>
+                        </div>
+
+                        <div id="languageConfigContainer" class="language-config-content">
+                            <div class="card mb-3">
+                                <div class="card-header">
+                                    <h5 id="currentLanguageTitle" class="mb-0"></h5>
+                                </div>
+                                <div class="card-body">
+                                    <form id="languageConfigForm">
+                                        <div class="language-config-row">
+                                            <div class="language-config-col">
+                                                <div class="mb-3">
+                                                    <label for="analysisDepth"
+                                                        class="form-label fw-bold fs-6 mt-3">Analysis Depth</label>
+                                                    <select class="form-select" id="analysisDepth">
+                                                        <option value="basic">Basic</option>
+                                                        <option value="moderate">Moderate</option>
+                                                        <option value="detailed">Detailed</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold fs-6 mt-3">Focus Areas</label>
+                                                    <div id="focusAreasContainer" class="checkbox-grid">
+                                                        <!-- Focus areas checkboxes will be inserted here -->
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="language-config-row">
+                                            <div class="language-config-col">
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold fs-6 mt-3">Special Analysis</label>
+                                                    <div id="specialAnalysisContainer" class="checkbox-grid">
+                                                        <!-- Special analysis checkboxes will be inserted here -->
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+                                            <button type="button" id="resetLanguageConfigBtn"
+                                                class="btn btn-outline-secondary action-btn">
+                                                <i class="fas fa-undo me-1"></i> Reset to Defaults
+                                            </button>
+                                            <button type="button" id="saveLanguageConfigBtn"
+                                                class="btn btn-primary action-btn">
+                                                <i class="fas fa-save me-1"></i> Save Language Settings
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification container -->
+    <div class="alert-container" id="alertContainer"></div>
+
+    <!-- Navigation Modal -->
+    <div class="custom-modal" id="navigationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-check-circle text-success me-2"></i>Configuration Saved
+                    Successfully</h5>
+            </div>
+            <div class="modal-body">
+                <p>Your documentation configuration has been saved. What would you like to do next?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary action-btn" id="stayHereBtn">
+                    <i class="fas fa-pencil-alt me-1"></i> Continue Editing
+                </button>
+                <button type="button" class="btn btn-primary action-btn" id="goHomeBtn">
+                    <i class="fas fa-file-alt me-1"></i> Generate Documentation
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Default configuration values
+            const defaultConfig = {
+                include_overview: true,
+                include_executive_summary: false,
+                include_tech_stack: true,
+                include_code_structure: true,
+                include_features: true,
+                include_dependencies: true,
+                include_issues: true,
+                include_sql_objects: true,
+                include_class_diagram: true,
+                include_flow_diagram: true,
+                include_er_diagram: false,
+                include_reference_architecture: true
+            };
+
+            // Language configuration management
+            let currentLanguage = '';
+            let languageConfigs = {};
+
+            // Default language configurations
+            const defaultLanguageConfigs = {
+                "COBOL": {
+                    "analysis_depth": "detailed",
+                    "focus_areas": ["divisions", "paragraphs", "files", "tables"],
+                    "special_analysis": {
+                        "division_analysis": true,
+                        "copybook_analysis": true,
+                        "file_definition_analysis": true
+                    }
+                },
+                "Java": {
+                    "analysis_depth": "detailed",
+                    "focus_areas": ["classes", "interfaces", "packages", "dependencies"],
+                    "special_analysis": {
+                        "spring_analysis": true,
+                        "jpa_analysis": true,
+                        "design_patterns": true
+                    }
+                },
+                "Python": {
+                    "analysis_depth": "detailed",
+                    "focus_areas": ["classes", "functions", "modules", "packages", "dependencies"],
+                    "special_analysis": {
+                        "django_analysis": true,
+                        "flask_analysis": true,
+                        "fastapi_analysis": true,
+                        "async_analysis": true,
+                        "decorator_analysis": true,
+                        "exception_handling_analysis": true,
+                        "data_structure_analysis": true
+                    }
+                },
+                "VB.NET": {
+                    "analysis_depth": "basic",
+                    "focus_areas": ["forms", "modules", "classes", "controls"],
+                    "special_analysis": {
+                        "winforms_analysis": true,
+                        "legacy_component_analysis": true
+                    }
+                },
+                "SQL": {
+                    "analysis_depth": "detailed",
+                    "focus_areas": ["tables", "procedures", "functions", "triggers"],
+                    "special_analysis": {
+                        "table_relationship_analysis": true,
+                        "stored_procedure_analysis": true,
+                        "trigger_analysis": true
+                    }
+                },
+                "C": {
+                    "analysis_depth": "moderate",
+                    "focus_areas": ["functions", "structs", "headers", "macros"],
+                    "special_analysis": {
+                        "header_dependency_analysis": true,
+                        "memory_management_analysis": true
+                    }
+                },
+                "ABAP": {
+                    "analysis_depth": "basic",
+                    "focus_areas": ["reports", "function_modules", "bapis", "tables"],
+                    "special_analysis": {
+                        "sap_module_analysis": true,
+                        "bapi_analysis": true,
+                        "authorization_check_analysis": true
+                    }
+                },
+                "RPG": {
+                    "analysis_depth": "detailed",
+                    "focus_areas": ["procedures", "subprocedures", "files", "indicators"],
+                    "special_analysis": {
+                        "cycle_analysis": true,
+                        "file_definition_analysis": true,
+                        "copybook_analysis": true
+                    }
+                }
+            };
+
+            // All possible focus areas and special analysis options
+            const allFocusAreas = [
+                { id: 'structure', label: 'Structure' },
+                { id: 'functions', label: 'Functions' },
+                { id: 'dependencies', label: 'Dependencies' },
+                { id: 'classes', label: 'Classes' },
+                { id: 'interfaces', label: 'Interfaces' },
+                { id: 'packages', label: 'Packages' },
+                { id: 'modules', label: 'Modules' },  // For Python
+                { id: 'procedures', label: 'Procedures' },  // For RPG
+                { id: 'subprocedures', label: 'Subprocedures' },  // For RPG
+                { id: 'files', label: 'Files' },  // For RPG
+                { id: 'indicators', label: 'Indicators' },  // For RPG
+                { id: 'divisions', label: 'Divisions' },
+                { id: 'paragraphs', label: 'Paragraphs' },
+                { id: 'tables', label: 'Tables' },
+                { id: 'forms', label: 'Forms' },
+                { id: 'controls', label: 'Controls' },
+                { id: 'procedures', label: 'Procedures' },
+                { id: 'triggers', label: 'Triggers' },
+                { id: 'structs', label: 'Structs' },
+                { id: 'headers', label: 'Headers' },
+                { id: 'macros', label: 'Macros' },
+                { id: 'reports', label: 'Reports' },
+                { id: 'function_modules', label: 'Function Modules' },
+                { id: 'bapis', label: 'BAPIs' }
+            ];
+
+            const allSpecialAnalysis = {
+                "COBOL": [
+                    { id: 'division_analysis', label: 'Division Analysis' },
+                    { id: 'copybook_analysis', label: 'Copybook Analysis' },
+                    { id: 'file_definition_analysis', label: 'File Definition Analysis' }
+                ],
+                "Java": [
+                    { id: 'spring_analysis', label: 'Spring Framework Analysis' },
+                    { id: 'jpa_analysis', label: 'JPA Analysis' },
+                    { id: 'design_patterns', label: 'Design Patterns Analysis' }
+                ],
+                "Python": [
+                    { id: 'django_analysis', label: 'Django Framework Analysis' },
+                    { id: 'flask_analysis', label: 'Flask Framework Analysis' },
+                    { id: 'fastapi_analysis', label: 'FastAPI Framework Analysis' },
+                    { id: 'async_analysis', label: 'Async/Await Analysis' },
+                    { id: 'decorator_analysis', label: 'Decorator Analysis' },
+                    { id: 'exception_handling_analysis', label: 'Exception Handling Analysis' },
+                    { id: 'data_structure_analysis', label: 'Data Structure Analysis' }
+                ],
+                "VB.NET": [
+                    { id: 'winforms_analysis', label: 'Windows Forms Analysis' },
+                    { id: 'legacy_component_analysis', label: 'Legacy Component Analysis' }
+                ],
+                "SQL": [
+                    { id: 'table_relationship_analysis', label: 'Table Relationship Analysis' },
+                    { id: 'stored_procedure_analysis', label: 'Stored Procedure Analysis' },
+                    { id: 'trigger_analysis', label: 'Trigger Analysis' }
+                ],
+                "C": [
+                    { id: 'header_dependency_analysis', label: 'Header Dependency Analysis' },
+                    { id: 'memory_management_analysis', label: 'Memory Management Analysis' }
+                ],
+                "ABAP": [
+                    { id: 'sap_module_analysis', label: 'SAP Module Analysis' },
+                    { id: 'bapi_analysis', label: 'BAPI Analysis' },
+                    { id: 'authorization_check_analysis', label: 'Authorization Check Analysis' }
+                ],
+                "RPG": [
+                    { id: 'cycle_analysis', label: 'RPG Cycle Analysis' },
+                    { id: 'file_definition_analysis', label: 'File Definition Analysis' },
+                    { id: 'copybook_analysis', label: 'Copybook Analysis' }
+                ]
+            };
+
+            // Function to show a notification
+            function showNotification(message, type = 'success') {
+                const alertContainer = document.getElementById('alertContainer');
+                const alertElement = document.createElement('div');
+                alertElement.className = `alert alert-${type} alert-dismissible fade show`;
+                alertElement.innerHTML = `
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                `;
+                alertContainer.appendChild(alertElement);
+
+                // Auto-dismiss after 5 seconds
+                setTimeout(() => {
+                    alertElement.classList.remove('show');
+                    setTimeout(() => alertContainer.removeChild(alertElement), 300);
+                }, 5000);
+            }
+
+            // Function to show the navigation modal
+            function showNavigationModal() {
+                const modal = document.getElementById('navigationModal');
+                modal.style.display = 'flex';
+                modal.style.animation = 'fadeIn 0.3s ease-in-out';
+            }
+
+            // Function to hide the navigation modal
+            function hideNavigationModal() {
+                const modal = document.getElementById('navigationModal');
+                modal.style.display = 'none';
+            }
+
+            // Function to apply configuration to form
+            function applyConfig(config) {
+                // For each checkbox field
+                document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                    const fieldName = checkbox.id;
+                    // If the field exists in the config, use it; otherwise use default
+                    checkbox.checked = config[fieldName] !== undefined ? config[fieldName] : defaultConfig[fieldName];
+                });
+            }
+
+            // Load language configurations
+            function loadLanguageConfigs() {
+                fetch('/get-language-configs')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            languageConfigs = data.language_configs;
+                            console.log('Loaded language configs:', languageConfigs);
+                        } else {
+                            showNotification('Failed to load language configurations', 'warning');
+                            // Initialize with default configs
+                            languageConfigs = JSON.parse(JSON.stringify(defaultLanguageConfigs));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading language configs:', error);
+                        showNotification('Error loading language configurations', 'danger');
+                        // Initialize with default configs
+                        languageConfigs = JSON.parse(JSON.stringify(defaultLanguageConfigs));
+                    });
+            }
+
+            // Show configuration form for selected language
+            function showLanguageConfig(language) {
+                currentLanguage = language;
+                const container = document.getElementById('languageConfigContainer');
+                const title = document.getElementById('currentLanguageTitle');
+                const focusAreasContainer = document.getElementById('focusAreasContainer');
+                const specialAnalysisContainer = document.getElementById('specialAnalysisContainer');
+                const analysisDepthSelect = document.getElementById('analysisDepth');
+
+                if (!language) {
+                    container.classList.remove('active');
+                    return;
+                }
+
+                // Update active button
+                document.querySelectorAll('.language-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.lang === language);
+                });
+
+                // Show container if hidden
+                container.classList.add('active');
+
+                // Set title
+                title.textContent = `${language} Configuration`;
+
+                // Get the config for this language (or use defaults if not exists)
+                const config = languageConfigs[language] || defaultLanguageConfigs[language];
+
+                // Set analysis depth
+                analysisDepthSelect.value = config.analysis_depth || 'basic';
+
+                // Generate focus areas checkboxes
+                focusAreasContainer.innerHTML = '';
+
+                // Get relevant focus areas for this language
+                const relevantFocusAreas = allFocusAreas.filter(area => {
+                    if (['structure', 'functions', 'dependencies'].includes(area.id)) {
+                        return true; // Common for all languages
+                    }
+                    if (language === 'COBOL' && ['divisions', 'paragraphs', 'files', 'tables'].includes(area.id)) {
+                        return true;
+                    }
+                    if (language === 'Java' && ['classes', 'interfaces', 'packages'].includes(area.id)) {
+                        return true;
+                    }
+                    if (language === 'VB.NET' && ['forms', 'modules', 'classes', 'controls'].includes(area.id)) {
+                        return true;
+                    }
+                    if (language === 'SQL' && ['tables', 'procedures', 'functions', 'triggers'].includes(area.id)) {
+                        return true;
+                    }
+                    if (language === 'C' && ['functions', 'structs', 'headers', 'macros'].includes(area.id)) {
+                        return true;
+                    }
+                    if (language === 'ABAP' && ['reports', 'function_modules', 'bapis', 'tables'].includes(area.id)) {
+                        return true;
+                    }
+                    if (language === 'Python' && ['classes', 'functions', 'modules', 'packages'].includes(area.id)) {
+                        return true;
+                    }
+                    if (language === 'RPG' && ['procedures', 'subprocedures', 'files', 'indicators'].includes(area.id)) {
+                        return true;
+                    }
+                    return false;
+                });
+
+                relevantFocusAreas.forEach(area => {
+                    const isChecked = config.focus_areas && config.focus_areas.includes(area.id);
+                    focusAreasContainer.innerHTML += `
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="focus_${area.id}" 
+                                ${isChecked ? 'checked' : ''}>
+                            <label class="form-check-label" for="focus_${area.id}">${area.label}</label>
+                        </div>
+                    `;
+                });
+
+                // Generate special analysis checkboxes
+                specialAnalysisContainer.innerHTML = '';
+                const specialAnalysisOptions = allSpecialAnalysis[language] || [];
+
+                specialAnalysisOptions.forEach(option => {
+                    const isChecked = config.special_analysis && config.special_analysis[option.id];
+                    specialAnalysisContainer.innerHTML += `
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="special_${option.id}" 
+                                ${isChecked ? 'checked' : ''}>
+                            <label class="form-check-label" for="special_${option.id}">${option.label}</label>
+                        </div>
+                    `;
+                });
+            }
+
+            // Save language configuration
+            function saveLanguageConfig() {
+                if (!currentLanguage) return;
+
+                const config = {
+                    analysis_depth: document.getElementById('analysisDepth').value,
+                    focus_areas: [],
+                    special_analysis: {}
+                };
+
+                // Get focus areas
+                document.querySelectorAll('#focusAreasContainer input[type="checkbox"]').forEach(checkbox => {
+                    if (checkbox.checked) {
+                        config.focus_areas.push(checkbox.id.replace('focus_', ''));
+                    }
+                });
+
+                // Get special analysis
+                document.querySelectorAll('#specialAnalysisContainer input[type="checkbox"]').forEach(checkbox => {
+                    const key = checkbox.id.replace('special_', '');
+                    config.special_analysis[key] = checkbox.checked;
+                });
+
+                // Send to server
+                fetch('/save-language-config', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        language: currentLanguage,
+                        config: config
+                    }),
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            showNotification(`${currentLanguage} configuration saved successfully`, 'success');
+                            // Update our local copy
+                            languageConfigs[currentLanguage] = config;
+                        } else {
+                            showNotification(`Error saving ${currentLanguage} configuration: ${data.message}`, 'danger');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showNotification('Error saving language configuration', 'danger');
+                    });
+            }
+
+            // Reset language config to defaults
+            function resetLanguageConfig() {
+                if (!currentLanguage || !confirm(`Reset ${currentLanguage} configuration to defaults?`)) return;
+
+                // Use the default config
+                languageConfigs[currentLanguage] = defaultLanguageConfigs[currentLanguage];
+
+                // Update the form
+                showLanguageConfig(currentLanguage);
+                showNotification(`${currentLanguage} configuration reset to defaults`, 'info');
+            }
+
+            // Switch between configuration tabs
+            function switchTab(tabId) {
+                // Update active tab
+                document.querySelectorAll('.config-tab').forEach(tab => {
+                    tab.classList.toggle('active', tab.dataset.tab === tabId);
+                });
+
+                // Show corresponding section
+                document.querySelectorAll('.config-section').forEach(section => {
+                    section.classList.toggle('active', section.id === `${tabId}-section`);
+                });
+
+                // If switching to language config, initialize the first language if none selected
+                if (tabId === 'lang-config' && !currentLanguage) {
+                    const firstLangBtn = document.querySelector('.language-btn');
+                    if (firstLangBtn) {
+                        showLanguageConfig(firstLangBtn.dataset.lang);
+                    }
+                }
+            }
+
+            // Add webmanifest if it doesn't exist
+            if (!document.querySelector('link[rel="manifest"]').href) {
+                const manifestData = {
+                    "name": "DocWriter Tool",
+                    "short_name": "DocWriter",
+                    "icons": [
+                        {
+                            "src": "/static/images/YCAT_Logo.png",
+                            "sizes": "192x192",
+                            "type": "image/png"
+                        },
+                        {
+                            "src": "/static/images/YCAT_Logo.png",
+                            "sizes": "512x512",
+                            "type": "image/png"
+                        }
+                    ],
+                    "theme_color": "#4218EE",
+                    "background_color": "#D6E4F0",
+                    "display": "standalone"
+                };
+
+                const blob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
+                const manifestURL = URL.createObjectURL(blob);
+                document.querySelector('link[rel="manifest"]').href = manifestURL;
+            }
+
+            // Add smooth animations to cards
+            document.querySelectorAll('.config-card').forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+            });
+
+            // Make cards collapsible
+            document.querySelectorAll('.collapsible-card .card-header').forEach(header => {
+                header.addEventListener('click', function () {
+                    const card = this.closest('.collapsible-card');
+                    card.classList.toggle('collapsed');
+                });
+            });
+
+            // Initialize all cards as expanded
+            document.querySelectorAll('.collapsible-card').forEach(card => {
+                card.classList.remove('collapsed');
+            });
+
+            // Tab switching
+            document.querySelectorAll('.config-tab').forEach(tab => {
+                tab.addEventListener('click', function () {
+                    switchTab(this.dataset.tab);
+                });
+            });
+
+            // Load configuration from server
+            fetch('/get-config')
+                .then(response => response.json())
+                .then(config => {
+                    // Apply configuration to form
+                    applyConfig(config);
+                })
+                .catch(error => {
+                    console.error('Error loading configuration:', error);
+                    // Apply default configuration if loading fails
+                    applyConfig(defaultConfig);
+                    showNotification('Failed to load configuration. Using defaults.', 'warning');
+                });
+
+            // Reset to defaults button
+            document.getElementById('resetConfigBtn').addEventListener('click', function () {
+                if (confirm('Are you sure you want to reset all settings to defaults?')) {
+                    applyConfig(defaultConfig);
+                    showNotification('Settings reset to defaults. Click Save to apply.', 'info');
+                }
+            });
+
+            // Navigation modal buttons
+            document.getElementById('stayHereBtn').addEventListener('click', function () {
+                hideNavigationModal();
+            });
+
+            document.getElementById('goHomeBtn').addEventListener('click', function () {
+                window.location.href = '/';
+            });
+
+            // Form submission
+            document.getElementById('configForm').addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                // Collect form data
+                const configData = {};
+
+                // Process all checkboxes
+                document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                    configData[checkbox.id] = checkbox.checked;
+                });
+
+                // Send data to server
+                fetch('/save-config', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(configData),
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            // Show navigation modal instead of notification
+                            showNavigationModal();
+                        } else {
+                            showNotification('Error saving configuration: ' + data.message, 'danger');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showNotification('Error saving configuration', 'danger');
+                    });
+            });
+
+            // Close modal when clicking outside the modal content
+            window.addEventListener('click', function (event) {
+                const modal = document.getElementById('navigationModal');
+                if (event.target === modal) {
+                    hideNavigationModal();
+                }
+            });
+
+            // Language selection buttons
+            document.querySelectorAll('.language-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    showLanguageConfig(this.dataset.lang);
+                });
+            });
+
+            // Save language config button
+            document.getElementById('saveLanguageConfigBtn').addEventListener('click', saveLanguageConfig);
+
+            // Reset language config button
+            document.getElementById('resetLanguageConfigBtn').addEventListener('click', resetLanguageConfig);
+
+            // Load language configs when page loads
+            loadLanguageConfigs();
+        });
+    </script>
+</body>
+
+</html>

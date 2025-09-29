@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Viewer</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom styles -->
+    <style>
+        .document-container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .document-content {
+            padding: 20px;
+            min-height: 400px;
+            line-height: 1.6;
+        }
+        
+        .document-header {
+            border-bottom: 1px solid #e9ecef;
+            padding-bottom: 15px;
+        }
+        
+        .action-buttons {
+            margin-top: 20px;
+        }
+        
+        .btn-download {
+            background-color: #007bff;
+            color: white;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-download:hover {
+            background-color: #0069d9;
+        }
+        
+        .btn-back {
+            background-color: #6c757d;
+            color: white;
+            cursor: pointer;
+        }
+        
+        .btn-back:hover {
+            background-color: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    {% block content %}
+    <div class="container mt-5">
+        <div class="document-container">
+            <div class="document-header p-4 d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">{{ doc_name }}</h2>
+                <!-- Changed from <a> to <button> with onclick -->
+                <button onclick="goBack()" class="btn btn-back">
+                    <i class="bi bi-arrow-left me-2"></i>Back to Documents
+                </button>
+            </div>
+            
+            <div class="document-content">
+                {{ content|safe }}
+            </div>
+            
+            <div class="action-buttons p-4 d-flex">
+                <a href="{{ url_for('download_document', doc_id=request.view_args.doc_id) }}" 
+                   class="btn btn-download">
+                   <i class="bi bi-download me-2"></i>Download Document
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endblock %}
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        function goBack() {
+            // Check if there's a previous page in history
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                // Fallback to user_documents if no history
+                window.location.href = "{{ url_for('user_documents') }}";
+            }
+        }
+    </script>
+</body>
+</html>

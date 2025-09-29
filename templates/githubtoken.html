@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Token Generator - YCAT Tool</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/YCAT_Logo.png') }}" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --secondary-color: #6c757d;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --sidebar-width: 380px;
+            --header-height: 70px;
+            --navbar-height: 70px;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: #f8fafc;
+            min-height: 100vh;
+            margin: 0;
+            padding-top: var(--navbar-height);
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--navbar-height);
+            background: white;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+            z-index: 2000;
+            padding: 0.75rem 2rem;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            text-decoration: none;
+        }
+
+        .logo-container {
+            width: auto;
+            /* Adjust width as needed */
+            height: 50px;
+            /* Adjust height as needed */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            /* Ensure the image doesn't overflow */
+            background-color: white;
+            /* Add background if needed */
+        }
+
+        /* Logo Image */
+        .logo-container img {
+            width: auto;
+            /* Ensure the image fills the container */
+            height: 100%;
+            /* Maintain aspect ratio */
+            object-fit: contain;
+            /* Ensure the image fits within the container */
+        }
+
+        /* Responsive Logo */
+        @media (max-width: 768px) {
+            .logo-container {
+                width: 40px;
+                height: 40px;
+            }
+        }
+
+
+        /* Layout */
+        .split-layout {
+            display: flex;
+            min-height: calc(100vh - var(--navbar-height));
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            position: fixed;
+            left: 0;
+            top: var(--navbar-height);
+            height: calc(100vh - var(--navbar-height));
+            background: white;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            z-index: 1500;
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 2.5rem;
+        }
+
+        /* Steps */
+        .step-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1.25rem;
+            padding: 1.25rem;
+            border-radius: 1rem;
+            background: white;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(79, 70, 229, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .step-item:hover {
+            transform: translateX(5px);
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 20px rgba(79, 70, 229, 0.15);
+        }
+
+        .step-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary-color), #6366f1);
+            color: white;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            margin-right: 1.25rem;
+            font-weight: 600;
+            font-size: 1rem;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+        }
+
+        .step-content {
+            font-size: 1rem;
+            color: #1f2937;
+            line-height: 1.5;
+        }
+
+        .step-content a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .step-content a:hover {
+            color: #4338ca;
+        }
+
+        /* Guide Section */
+        .guide-section {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 2.5rem;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.06);
+        }
+
+        .section-title {
+            color: #111827;
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
+        .guide-section .lead {
+            font-size: 1.15rem;
+            color: #1f2937;
+            line-height: 1.7;
+            margin-bottom: 2.5rem;
+        }
+
+        /* Images */
+        .guide-image-container {
+            position: relative;
+            margin: 2.5rem 0;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .guide-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+
+        .guide-image-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .guide-image-container:hover .guide-image {
+            transform: scale(1.02);
+        }
+
+        .zoom-indicator {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(0, 0, 0, 0.75);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .guide-image-container:hover .zoom-indicator {
+            opacity: 1;
+        }
+
+        /* Modal */
+        .image-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            z-index: 2100;
+            backdrop-filter: blur(5px);
+        }
+
+        .image-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            max-width: 90%;
+            max-height: 90vh;
+            border-radius: 1rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .close-modal:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Warning Box */
+        .warning-container {
+            background: linear-gradient(to right, #fff7ed, #ffedd5);
+            border-left: 4px solid var(--warning-color);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            margin-top: 2.5rem;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.1);
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .warning-icon {
+            color: #92400e;
+            flex-shrink: 0;
+        }
+
+        .warning-text {
+            color: #92400e;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* Mobile Menu Toggle */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 1024px) {
+            :root {
+                --sidebar-width: 320px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: block;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 1.5rem;
+            }
+
+            .navbar {
+                padding: 0.75rem 1rem;
+            }
+
+            .guide-section {
+                padding: 1.5rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .guide-section {
+                padding: 1.25rem;
+            }
+
+            .warning-container {
+                padding: 1rem;
+            }
+
+            .step-item {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <a class="navbar-brand" href="/">
+                <div class="logo-container">
+                    <img src="{{ url_for('static', filename='images/Yash_Logo.png') }}" alt="YCAT Logo">
+                </div>
+                <span class="fw-bold" style="color: #4f46e5;">YCAT Tool</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="split-layout">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="p-4">
+                <h2 class="h4 mb-4 text-gray-900 fw-bold">Quick Steps Guide</h2>
+                <div class="steps-container">
+                    <div class="step-item">
+                        <span class="step-number">1</span>
+                        <div class="step-content">
+                            Access GitHub's <a href="https://github.com/settings/tokens" target="_blank"
+                                rel="noopener">Developer Settings</a>
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <span class="step-number">2</span>
+                        <div class="step-content">
+                            Select "Generate token"
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <span class="step-number">3</span>
+                        <div class="step-content">
+                            Choose "Generate new token (classic)"
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <span class="step-number">4</span>
+                        <div class="step-content">
+                            Enable required permissions: repo and admin:repo_hook
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <span class="step-number">5</span>
+                        <div class="step-content">
+                            Generate and save your token
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <span class="step-number">6</span>
+                        <div class="step-content">
+                            Copy token to StoriesOnBoard
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="guide-section">
+                <h1 class="section-title">Generate GitHub Personal Access Token</h1>
+                <p class="lead">
+                    Follow this guide to generate a new Personal Access Token for connecting GitHub with StoriesOnBoard.
+                    This process requires accessing GitHub's developer settings and configuring the appropriate
+                    permissions.
+                </p>
+
+                <div class="guide-image-container">
+                    <img src="{{ url_for('static', filename='images/image_1.jpg') }}" alt="GitHub Developer Settings"
+                        class="guide-image">
+                    <span class="zoom-indicator">
+                        <i class="fas fa-search-plus"></i>
+                        Click to zoom
+                    </span>
+                </div>
+
+                <h3 class="h5 mt-4 mb-3">Select Token Type</h3>
+                <p>Choose "Generate new token (classic)" from the available options.</p>
+                <div class="guide-image-container">
+                    <img src="{{ url_for('static', filename='images/image_2.jpg') }}" alt="Token Selection"
+                        class="guide-image">
+                    <span class="zoom-indicator">
+                        <i class="fas fa-search-plus"></i>
+                        Click to zoom
+                    </span>
+                </div>
+
+                <h3 class="h5 mt-4 mb-3">Configure Permissions</h3>
+                <p>Enable the following permissions for proper integration:</p>
+                <ul class="list-unstyled ms-4 mb-4">
+                    <li>• repo</li>
+                    <li>• admin:repo_hook</li>
+                </ul>
+                <div class="guide-image-container">
+                    <img src="{{ url_for('static', filename='images/image_3.jpg') }}" alt="Permission Settings"
+                        class="guide-image">
+                    <span class="zoom-indicator">
+                        <i class="fas fa-search-plus"></i>
+                        Click to zoom
+                    </span>
+                </div>
+
+                <h3 class="h5 mt-4 mb-3">Copy Token</h3>
+                <p>Copy your generated token and paste it into StoriesOnBoard integration settings.</p>
+                <div class="guide-image-container">
+                    <img src="{{ url_for('static', filename='images/image_4.jpg') }}" alt="Copy Token"
+                        class="guide-image">
+                    <span class="zoom-indicator">
+                        <i class="fas fa-search-plus"></i>
+                        Click to zoom
+                    </span>
+                </div>
+
+                <div class="warning-container">
+                    <svg class="warning-icon" width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    <p class="warning-text">
+                        For security purposes, store your token securely and never share it publicly or commit it to
+                        version control. The token provides access to your GitHub account and should be treated like a
+                        password.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Modal -->
+    <div class="image-modal" id="imageModal">
+        <button class="close-modal">
+            <i class="fas fa-times"></i>
+        </button>
+        <img class="modal-content" id="modalImage" src="" alt="Enlarged view">
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Mobile menu toggle functionality
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768) {
+                if (!sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
+                    sidebar.classList.remove('active');
+                }
+            }
+        });
+
+        // Image modal functionality
+        const modal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('modalImage');
+        const closeBtn = document.querySelector('.close-modal');
+        const guideImages = document.querySelectorAll('.guide-image');
+
+        guideImages.forEach(image => {
+            image.addEventListener('click', () => {
+                modal.classList.add('active');
+                modalImg.src = image.src;
+                document.body.style.overflow = 'hidden';
+            });
+        });
+
+        closeBtn.addEventListener('click', () => {
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        });
+
+        // Close modal on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                modal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // Close modal when clicking outside the image
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+        // Smooth scroll for sidebar links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('active');
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

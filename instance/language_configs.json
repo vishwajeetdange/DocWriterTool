@@ -1,0 +1,78 @@
+{
+  "COBOL": {
+    "analysis_depth": "basic",
+    "focus_areas": [
+      "divisions",
+      "paragraphs",
+      "files",
+      "tables"
+    ],
+    "special_analysis": {
+      "division_analysis": true,
+      "copybook_analysis": true,
+      "file_definition_analysis": true
+    }
+  },
+  "SQL": {
+    "analysis_depth": "detailed",
+    "focus_areas": [
+      "functions",
+      "dependencies",
+      "tables",
+      "triggers"
+    ],
+    "special_analysis": {
+      "table_relationship_analysis": false,
+      "stored_procedure_analysis": true,
+      "trigger_analysis": true
+    }
+  },
+  "RPG": {
+    "analysis_depth": "moderate",
+    "focus_areas": [
+      "procedures",
+      "subroutines",
+      "files",
+      "data_structures"
+    ],
+    "special_analysis": {
+      "ile_analysis": true,
+      "service_program_analysis": true,
+      "file_operation_analysis": true,
+      "sql_embedded_analysis": true
+    }
+  },
+  "CL": {
+    "analysis_depth": "basic",
+    "focus_areas": [
+      "commands",
+      "variables",
+      "programs",
+      "job_control"
+    ],
+    "special_analysis": {
+      "job_flow_analysis": true,
+      "system_command_analysis": true,
+      "error_handling_analysis": true
+    }
+  },
+  "Python": {
+    "analysis_depth": "detailed",
+    "focus_areas": [
+      "functions",
+      "dependencies",
+      "classes",
+      "packages",
+      "modules"
+    ],
+    "special_analysis": {
+      "django_analysis": false,
+      "flask_analysis": true,
+      "fastapi_analysis": false,
+      "async_analysis": true,
+      "decorator_analysis": true,
+      "exception_handling_analysis": true,
+      "data_structure_analysis": false
+    }
+  }
+}
